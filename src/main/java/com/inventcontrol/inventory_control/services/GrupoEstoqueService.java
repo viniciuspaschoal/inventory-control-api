@@ -10,14 +10,14 @@ import java.util.Optional;
 @Service
 public class GrupoEstoqueService {
 
-    private final GrupoEstoqueRepository repository;
+    private final GrupoEstoqueRepository grupoEstoqueRepository;
 
-    public GrupoEstoqueService(GrupoEstoqueRepository repository){
-        this.repository = repository;
+    public GrupoEstoqueService(GrupoEstoqueRepository grupoEstoqueRepository){
+        this.grupoEstoqueRepository = grupoEstoqueRepository;
     }
 
     public List<GrupoEstoque> listarTodos(){
-        return repository.findAll();
+        return grupoEstoqueRepository.findAll();
     }
 
     public GrupoEstoque salvar(GrupoEstoque novoGrupo){
@@ -39,7 +39,7 @@ public class GrupoEstoqueService {
         // 2. VALIDAÇÕES DE DUPLICIDADE (Consultando o banco)
 
         // Verifica DUPLICIDADE, já existe DESCRIÇÃO ou SIGLA
-        Optional<GrupoEstoque> grupoExistente = repository.findByDescricaoOrSigla(descricao, sigla);
+        Optional<GrupoEstoque> grupoExistente = grupoEstoqueRepository.findByDescricaoOrSigla(descricao, sigla);
         if (grupoExistente.isPresent()) {
             //Retorna erro dependendo do campo duplicado
             if (grupoExistente.get().getDescricao().equals(descricao)){
@@ -51,6 +51,6 @@ public class GrupoEstoqueService {
 
 
         // 3. Se passou pelas validações, manda o "braço" (Repository) salvar
-        return repository.save(novoGrupo);
+        return grupoEstoqueRepository.save(novoGrupo);
     }
 }

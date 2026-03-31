@@ -3,6 +3,7 @@ package com.inventcontrol.inventory_control.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
