@@ -2,6 +2,8 @@ package com.inventcontrol.inventory_control.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
@@ -9,6 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@DynamicInsert
 @Table(name = "deposito")
 public class Deposito {
 
@@ -22,4 +25,9 @@ public class Deposito {
 
     @Column(nullable = false, length = 100)
     private String descricao; // Ex: TEXFITY T1
+
+    @Builder.Default
+    @Column(name = "ativo", nullable = false) //coluna de ativo ou não ativo
+    @ColumnDefault("true")
+    private Boolean ativo = true; // Inicia como true por padrão
 }

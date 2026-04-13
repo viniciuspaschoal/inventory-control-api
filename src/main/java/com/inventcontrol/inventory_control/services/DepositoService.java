@@ -15,10 +15,12 @@ public class DepositoService {
         this.depositoRepository = depositoRepository;
     }
 
+    //Metodo GET
     public List<Deposito> listAll(){
-        return depositoRepository.findAll();
+        return depositoRepository.findByAtivoTrue();
     }
 
+    //POST
     public Deposito saveDeposit( Deposito newDeposit){
 
         //Regra de negócio simples
@@ -37,7 +39,7 @@ public class DepositoService {
         String descricao = newDeposit.getDescricao().trim();
         String sigla = newDeposit.getSigla().trim();
 
-        // 2. VALIDAÇÕES DE DUPLICIDADE (Consultando o banco)
+        //* VALIDAÇÕES DE DUPLICIDADE (Consultando o banco)
         // Verifica DUPLICIDADE, já existe DESCRIÇÃO ou SIGLA
 
         List<Deposito> depositoExistente = depositoRepository.findDepositoByDescricaoOrSigla(descricao, sigla);
@@ -56,5 +58,19 @@ public class DepositoService {
 
         // 3. Se passou pelas validações, manda o Repository salvar
         return depositoRepository.save(newDeposit);
+    }
+
+    //DELETE lógico - INATIVAR
+    public void inactivate(Long id){
+        //Busca o registro ou lança erro se o ID não existir
+        Deposito deposito = depositoRepository.findById(id)
+                .orElseThrow( () -> new RuntimeException("Depósito não encontrado."));
+
+        //Muda o status de para inativo
+        deposito.setAtivo(false);
+
+        //Salva a alteração no banco de dados
+        depositoRepository.save(deposito);
+        
     }
 }

@@ -26,4 +26,7 @@ public class GrupoEstoque {
     @Column(name = "descricao", nullable = false, length = 100)
     @JsonProperty("descricao")
     private String descricao;
+
+    @Column(name = "ativo", nullable = false) //coluna de ativo ou não ativo
+    private Boolean ativo = true; // Inicia como true por padrão
 }

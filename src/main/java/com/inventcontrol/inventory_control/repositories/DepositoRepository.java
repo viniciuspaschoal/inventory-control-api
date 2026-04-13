@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public interface DepositoRepository extends JpaRepository <Deposito, Long> {
 
+    List<Deposito> findByAtivoTrue();
+
     @Query( "SELECT d " +
             "FROM Deposito d " +
             "WHERE d.descricao = :descricao OR d.sigla = :sigla")

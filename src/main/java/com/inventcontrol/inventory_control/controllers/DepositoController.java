@@ -31,4 +31,11 @@ public class DepositoController {
         // O Controller apenas repassa para o Service validar e salvar
         return depositoService.saveDeposit(newDeposit);
     }
+
+    // 2. Rota para Deletar/Inativar um depósito (DELETE http://localhost:8080/deposito)
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id){
+        // Passa o id para o inactivate no Service
+        depositoService.inactivate(id);
+    }
 }
