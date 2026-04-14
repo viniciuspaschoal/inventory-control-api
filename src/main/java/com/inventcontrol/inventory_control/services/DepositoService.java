@@ -73,4 +73,45 @@ public class DepositoService {
         depositoRepository.save(deposito);
         
     }
+
+    //UPDATE trocar sigla ou descrição
+    public Deposito update(Long id, Deposito updatedData){
+        // 1 busca o item que já existe
+        Deposito exist = depositoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Depósito não encontrado"));
+
+        if (!exist.getAtivo()){
+            throw new RuntimeException("Não é possível editar um depósito inativo.");
+        }
+
+        if (updatedData.getDescricao() == null || updatedData.getDescricao().isBlank()){
+            throw new RuntimeException("Descrição é obrigatória");
+        }
+
+        if (updatedData.getSigla() == null || updatedData.getSigla().isBlank()){
+            throw new RuntimeException("Sigla é obrigatória");
+        }
+
+        String descricao = updatedData.getDescricao().trim().toUpperCase();
+        String sigla = updatedData.getSigla().trim().toUpperCase();
+
+        // 2 Validação: posso usar essa sigla ou descrição?
+        List<Deposito> conflicts = depositoRepository.findDepositoByDescricaoOrSigla(descricao, sigla);
+
+        for (Deposito conflict : conflicts){
+            if (!conflict.getId().equals(id)){
+                if (conflict.getDescricao().equalsIgnoreCase(descricao)){
+                    throw new RuntimeException("Descrição já adastrada");
+                }
+                if (conflict.getSigla().equalsIgnoreCase(sigla)){
+                    throw new RuntimeException("Sigla já existente");
+                }
+            }
+        }
+
+        exist.setDescricao(descricao);
+        exist.setSigla(sigla);
+
+        return depositoRepository.save(exist);
+    }
 }

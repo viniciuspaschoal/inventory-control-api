@@ -3,6 +3,7 @@ package com.inventcontrol.inventory_control.controllers;
 import com.inventcontrol.inventory_control.entities.Deposito;
 import com.inventcontrol.inventory_control.services.DepositoService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,5 +38,10 @@ public class DepositoController {
     public void delete(@PathVariable Long id){
         // Passa o id para o inactivate no Service
         depositoService.inactivate(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Deposito> update(@PathVariable Long id, @RequestBody Deposito deposito){
+        return ResponseEntity.ok(depositoService.update(id, deposito));
     }
 }

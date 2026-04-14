@@ -9,13 +9,15 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface DepositoRepository extends JpaRepository <Deposito, Long> {
+public interface DepositoRepository extends JpaRepository<Deposito, Long> {
 
     List<Deposito> findByAtivoTrue();
 
-    @Query( "SELECT d " +
-            "FROM Deposito d " +
-            "WHERE d.descricao = :descricao OR d.sigla = :sigla")
+    @Query("""
+                SELECT d FROM Deposito d
+                WHERE LOWER(d.descricao) = LOWER(:descricao)
+                   OR LOWER(d.sigla) = LOWER(:sigla)
+            """)
     List<Deposito> findDepositoByDescricaoOrSigla(@Param("descricao") String descricao,
                                                   @Param("sigla") String sigla);
 }
