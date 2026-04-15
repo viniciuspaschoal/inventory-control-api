@@ -16,11 +16,11 @@ public interface GrupoEstoqueRepository extends JpaRepository<GrupoEstoque, Long
 
     Optional<GrupoEstoque> findBySigla(String sigla);
 
-    List<Deposito> findByAtivoTrue();
+    List<GrupoEstoque> findByAtivoTrue();
 
     @Query( "SELECT g " +
             "FROM GrupoEstoque g " +
-            "WHERE g.descricao = :descricao OR g.sigla = :sigla")
-    Optional<GrupoEstoque> findByDescricaoOrSigla(@Param("descricao") String descricao,
+            "WHERE LOWER(g.descricao) = LOWER(:descricao) OR LOWER(g.sigla) = LOWER(:sigla)")
+    List<GrupoEstoque> findGrupoEstoqueByDescricaoOrSigla(@Param("descricao") String descricao,
                                                   @Param("sigla") String sigla);
 }

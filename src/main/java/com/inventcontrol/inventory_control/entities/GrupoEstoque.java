@@ -3,6 +3,8 @@ package com.inventcontrol.inventory_control.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Table(name = "grupo_estoque") //Nome exato da tabela no Postegres
@@ -11,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@DynamicInsert
 public class GrupoEstoque {
 
     @Id
@@ -27,6 +30,8 @@ public class GrupoEstoque {
     @JsonProperty("descricao")
     private String descricao;
 
+    @Builder.Default
+    @ColumnDefault("true")
     @Column(name = "ativo", nullable = false) //coluna de ativo ou não ativo
     private Boolean ativo = true; // Inicia como true por padrão
 }

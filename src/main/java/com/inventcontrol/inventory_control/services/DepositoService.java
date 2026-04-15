@@ -92,6 +92,7 @@ public class DepositoService {
             throw new RuntimeException("Sigla é obrigatória");
         }
 
+        // Normalização
         String descricao = updatedData.getDescricao().trim().toUpperCase();
         String sigla = updatedData.getSigla().trim().toUpperCase();
 

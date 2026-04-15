@@ -1,5 +1,6 @@
 package com.inventcontrol.inventory_control.services;
 
+import com.inventcontrol.inventory_control.entities.Deposito;
 import com.inventcontrol.inventory_control.entities.GrupoEstoque;
 import com.inventcontrol.inventory_control.repositories.GrupoEstoqueRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class GrupoEstoqueService {
     }
 
     public List<GrupoEstoque> listarTodos(){
-        return grupoEstoqueRepository.findAll();
+        return this.grupoEstoqueRepository.findByAtivoTrue();
     }
 
     public GrupoEstoque salvar(GrupoEstoque novoGrupo){
@@ -39,10 +40,14 @@ public class GrupoEstoqueService {
         // 2. VALIDAÇÕES DE DUPLICIDADE (Consultando o banco)
 
         // Verifica DUPLICIDADE, já existe DESCRIÇÃO ou SIGLA
-        Optional<GrupoEstoque> grupoExistente = grupoEstoqueRepository.findByDescricaoOrSigla(descricao, sigla);
-        if (grupoExistente.isPresent()) {
-            //Retorna erro dependendo do campo duplicado
-            if (grupoExistente.get().getDescricao().equals(descricao)){
+        List<GrupoEstoque> grupoExistente = this.grupoEstoqueRepository.findGrupoEstoqueByDescricaoOrSigla(descricao, sigla);
+        if (!grupoExistente.isEmpty()) {
+
+            // Pegamos o primeiro registro encontrado para comparar
+            GrupoEstoque encontrado = grupoExistente.get(0);
+
+            //Retorna erro de campo suplicado
+            if (encontrado.getDescricao().equals(descricao)){
                 throw new RuntimeException("Já existe um grupo cadastrado com esse nome.");
             } else {
                 throw new RuntimeException("A sigla '" + sigla + "' já está em uso");
@@ -51,6 +56,61 @@ public class GrupoEstoqueService {
 
 
         // 3. Se passou pelas validações, manda o "braço" (Repository) salvar
-        return grupoEstoqueRepository.save(novoGrupo);
+        return this.grupoEstoqueRepository.save(novoGrupo);
+    }
+
+    //DELETE - Inativar
+    public void inactivate(Long id){
+        //Busca o registro ou lança erro se o ID não existir
+        GrupoEstoque grupoEstoque = this.grupoEstoqueRepository.findById(id)
+                .orElseThrow( () -> new RuntimeException("Esse Grupo Estoque não foi encontrado"));
+
+        //Muda o status para negativo
+        grupoEstoque.setAtivo(false);
+
+        // Salva a alteração no Banco de Dados
+        this.grupoEstoqueRepository.save(grupoEstoque);
+    }
+
+    // UPDATE
+    public GrupoEstoque update(Long id, GrupoEstoque updateData){
+        //Buscar por um ítem que já existe
+        GrupoEstoque exist = this.grupoEstoqueRepository.findById(id)
+                .orElseThrow( () -> new RuntimeException("Grupo Estoque não encontrado"));
+
+        if (!exist.getAtivo()){
+            throw new RuntimeException("Não é possível alterar um grupo inativo");
+        }
+
+        if (updateData.getDescricao() == null || updateData.getDescricao().isBlank()){
+            throw new RuntimeException("Descrição é obrigatória");
+        }
+
+        if (updateData.getSigla() == null || updateData.getSigla().isBlank()){
+            throw new RuntimeException("Sigla é obrigatória");
+        }
+
+        String descricao = updateData.getDescricao().trim().toUpperCase();
+        String sigla = updateData.getSigla().trim().toUpperCase();
+
+        // Validação: posso usar essa sigla ou descrição?
+        List<GrupoEstoque> conflicts = this.grupoEstoqueRepository.findGrupoEstoqueByDescricaoOrSigla(descricao, sigla);
+
+        for (GrupoEstoque conflict : conflicts){
+            if (!conflict.getId().equals(id)){
+                if (conflict.getDescricao().equalsIgnoreCase(descricao)){
+                throw new RuntimeException("Descrição já cadastrada");
+                }
+
+                if (conflict.getSigla().equalsIgnoreCase(sigla)){
+                    throw new RuntimeException("Sigla já existente");
+                }
+            }
+        }
+
+        exist.setDescricao(descricao);
+        exist.setSigla(sigla);
+
+        return this.grupoEstoqueRepository.save(exist);
     }
 }
